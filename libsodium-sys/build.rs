@@ -343,6 +343,15 @@ fn build_libsodium() {
     // Determine build target triple
     let mut out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let target = env::var("TARGET").unwrap();
+    let target = if target.starts_with("riscv") {
+        let mut split = target.split("-");
+        let arch = split.next().unwrap();
+        let bitness = &arch[5..7];
+        let rest = split.collect::<Vec<_>>().join("-");
+        format!("riscv{}-{}", bitness, rest)
+    } else {
+        target
+    };
     let profile = env::var("PROFILE").unwrap();
 
     // Avoid issues with paths containing spaces by falling back to using a tempfile.
